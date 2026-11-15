@@ -16,9 +16,10 @@ jobs:
           channel: 'stable'
       - name: Setup Android Project & Permissions
         run: |
-          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml || true
-          flutter create --platforms=android .
-          cp /tmp/AndroidManifest.xml android/app/src/main/AndroidManifest.xml || true
+          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml
+          rm -rf android
+          flutter create --platforms=android --org com.athar.gnss .
+          cp /tmp/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
           flutter pub get
       - name: Build Release APK
         run: flutter build apk --release
