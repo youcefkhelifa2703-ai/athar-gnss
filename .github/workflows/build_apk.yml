@@ -14,8 +14,12 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
-      - name: Initialize Android project files
-        run: flutter create --platforms=android .
+      - name: Setup Android Project & Permissions
+        run: |
+          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml || true
+          flutter create --platforms=android .
+          cp /tmp/AndroidManifest.xml android/app/src/main/AndroidManifest.xml || true
+          flutter pub get
       - name: Build Release APK
         run: flutter build apk --release
       - name: Upload APK
