@@ -1,4 +1,4 @@
-name: Build Athar GNSS APK
+name: Build Athar Garmin APK & AAB
 
 on:
   push:
@@ -14,18 +14,27 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
-      - name: Setup Android Project & Permissions
+      - name: Prepare Clean Flutter Android Project
         run: |
-          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml
-          rm -rf android
-          flutter create --platforms=android --org com.athar.gnss .
-          cp /tmp/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+          mkdir -p /tmp/src_backup
+          cp pubspec.yaml /tmp/src_backup/
+          cp -r lib /tmp/src_backup/
+          cp android/app/src/main/AndroidManifest.xml /tmp/src_backup/
+          rm -rf android pubspec.lock
+          flutter create --platforms=android --org com.athar.gnss --project-name athar_gnss .
+          cp /tmp/src_backup/pubspec.yaml .
+          rm -rf lib && cp -r /tmp/src_backup/lib .
+          cp /tmp/src_backup/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
           flutter pub get
-      - name: Build Release APK
-        run: flutter build apk --release
-      - name: Upload APK
+      - name: Build APK & Play Store AppBundle
+        run: |
+          flutter build apk --release
+          flutter build appbundle --release
+      - name: Upload Play Store & APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Athar-GNSS-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
-          
+          name: Athar-Garmin-PlayStore-Files
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+            
